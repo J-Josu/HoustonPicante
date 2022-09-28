@@ -29,11 +29,13 @@ function buildSphereFace(hIndex: number, vIndex: number) {
   return new THREE.Mesh(geometry, material);
 }
 
-export const sphere = new THREE.Object3D();
+const moon = new THREE.Object3D();
 
 for (let i = 0; i < N_FACES; i++) {
-  sphere.add(buildSphereFace(i, 0));
+  moon.add(buildSphereFace(i, 0));
 }
 for (let i = 0; i < N_FACES; i++) {
-  sphere.add(buildSphereFace(i, 1));
+  moon.add(buildSphereFace(i, 1));
 }
+
+export { moon }

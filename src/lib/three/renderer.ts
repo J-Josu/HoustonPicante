@@ -14,6 +14,7 @@ function createRenderer() {
 
 export const renderer = createRenderer();
 
-export function resizeRenderer() {
+// on window rezize event
+function resizeRenderer() {
   renderer.setSize(window.innerWidth, window.innerHeight);
 }

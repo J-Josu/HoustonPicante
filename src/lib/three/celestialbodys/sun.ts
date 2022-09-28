@@ -8,7 +8,7 @@ const SUN_ARITHMETIC_MEAN_RADIUS = 695_700
 const QUALITY = 4;
 
 const radius = SUN_ARITHMETIC_MEAN_RADIUS * CONST.UNIT_TO_KM;
-const sunEarthDistance = - CONST.SUN_MOON_UNITS
+const sunOriginDistance = - (CONST.SUN_EARTH_UNITS - CONST.EARTH_MOON_UNITS)
 
 const geometry = new SphereGeometry(
   radius,
@@ -28,9 +28,11 @@ const material = new MeshBasicMaterial({
 const sun = new Mesh(geometry, material);
 
 sun.position.set(
-  sunEarthDistance,
+  sunOriginDistance,
   0,
   0
 );
+
+sun.visible = false;
 
 export { sun };

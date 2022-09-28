@@ -4,20 +4,20 @@
   import { camera, resizeCamera } from '$lib/three/camera';
   import { renderer, resizeRenderer } from '$lib/three/renderer';
   import { scene } from '$lib/three/scene';
-  import { sphere } from '$lib/three/sphere';
+  import { moon } from '$lib/three/moon';
   import {
     setupControls,
     resizeControls,
     updateControls,
-  } from '$lib/three/controls';
+  } from 'unused/controls';
   import { MathUtils, Vector3 } from 'three';
-  import CameraControls from 'camera-controls';
   import { earth } from '$three/celestialbodys/earth';
   import { sun } from '$three/celestialbodys/sun';
   import { EARTH_MOON_UNITS } from '$three/constants';
+  import CameraControls from 'camera-controls';
   CameraControls.install({ THREE: THREE });
 
-  scene.add(sphere);
+  scene.add(moon);
   scene.add(earth);
   scene.add(sun);
 

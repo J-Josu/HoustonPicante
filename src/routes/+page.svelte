@@ -1,48 +1,44 @@
 <script lang="ts">
   import { onMount } from 'svelte';
-  import * as THREE from 'three';
-  import { camera, resizeCamera } from '$lib/three/camera';
-  import { renderer, resizeRenderer } from '$lib/three/renderer';
-  import { scene } from '$lib/three/scene';
-  import { sphere } from '$lib/three/sphere';
-  import {
-    setupControls,
-    resizeControls,
-    updateControls,
-  } from '$lib/three/controls';
-    import { createPoint } from '$three/point';
-    import { Vector3 } from 'three';
-    import { earth } from '$three/celestialbodys/earth';
-    import { sun } from '$three/celestialbodys/sun';
+  import { animate, init, onWindowResize, toggleExternalBodys } from './setup';
 
-  scene.add(sphere);
-  scene.add(earth);
-  scene.add(sun);
-  const newCube = createPoint(5,new Vector3());
-  scene.add(newCube)
+  let initilized = false;
+  let enableContext = false;
 
-  function animate() {
-    requestAnimationFrame(animate);
-    updateControls();
-    renderer.render(scene, camera);
+  function toggleContext() {
+    enableContext = !enableContext;
+    toggleExternalBodys(enableContext);
   }
 
-  function init(element: HTMLElement) {
-    element.appendChild(renderer.domElement);
-    setupControls(camera, renderer.domElement);
-  }
-
-  function onWindowResize() {
-    resizeCamera();
-    resizeRenderer();
-    resizeControls();
-  }
-
-  onMount(animate);
+  onMount(() => {
+    animate();
+  });
 </script>
 
 <svelte:window on:resize={onWindowResize} />
 
-<main use:init>
-  <p>hola</p>
-</main>
+<main use:init />
+
+<div>
+  <button on:click={toggleContext}>Enable context</button>
+</div>
+
+<style>
+  div {
+    display: flex;
+    gap: 0.5rem;
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 0.25rem;
+  }
+  button {
+    padding: 0.5ch;
+    background: none;
+    font-weight: 500;
+    color: hsl(0, 0%, 70%);
+    border: 1px solid hsl(0, 0%, 70%);
+    border-radius: 2px;
+    cursor: pointer;
+  }
+</style>
