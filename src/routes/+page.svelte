@@ -10,8 +10,16 @@
     resizeControls,
     updateControls,
   } from '$lib/three/controls';
+    import { createPoint } from '$three/point';
+    import { Vector3 } from 'three';
+    import { earth } from '$three/celestialbodys/earth';
+    import { sun } from '$three/celestialbodys/sun';
 
   scene.add(sphere);
+  scene.add(earth);
+  scene.add(sun);
+  const newCube = createPoint(5,new Vector3());
+  scene.add(newCube)
 
   function animate() {
     requestAnimationFrame(animate);
@@ -35,4 +43,6 @@
 
 <svelte:window on:resize={onWindowResize} />
 
-<main use:init />
+<main use:init>
+  <p>hola</p>
+</main>

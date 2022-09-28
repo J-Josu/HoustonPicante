@@ -1,4 +1,5 @@
-import { AxesHelper, GridHelper, type Scene } from 'three';
+import { AxesHelper, CameraHelper, GridHelper, type Scene } from 'three';
+import { camera } from './camera';
 
 const axesHelper = new AxesHelper(10);
 
@@ -12,7 +13,10 @@ const gridHelper = new GridHelper(
   'hsl(0, 0%, 25%)'
 );
 
+const cameraHelper = new CameraHelper(camera);
+
 export function setupHelpers(scene: Scene) {
-  scene.add(gridHelper);
+  // scene.add(gridHelper);
   scene.add(axesHelper);
+  // scene.add(cameraHelper);
 }
