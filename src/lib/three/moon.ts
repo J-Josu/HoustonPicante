@@ -33,7 +33,7 @@ const moon = new THREE.Group();
 
 const moonEdges = new THREE.LineSegments(
   new THREE.EdgesGeometry(new THREE.SphereGeometry(
-    MOON_UNIT_RADIUS,
+    MOON_UNIT_RADIUS * 0.995,
     16,
     16
   )),
@@ -54,21 +54,13 @@ for (let i = 0; i < N_FACES; i++) {
 export { moon, moonEdges }
 
 export function toggleMoonWireframe() {
-  // moon.children.forEach(child => child.material.wireframe = !child.material.wireframe)
-  moon.children.forEach(child => child.visible = !child.visible)
+  moonEdges.visible = !moonEdges.visible;
 }
 export function toggleMoonInterior() {
   moon.children.forEach(child => {
     const material = child.material as Material;
-    if (material.transparent) {
-      material.transparent = false;
-      material.side = THREE.FrontSide
-      moonEdges.visible = false
-    }
-    else {
-      material.transparent = true;
-      material.side = THREE.BackSide;
-      moonEdges.visible = true
-    }
+    material.side = material.side === THREE.FrontSide ?
+      material.side = THREE.BackSide :
+      material.side = THREE.FrontSide;
   })
 }

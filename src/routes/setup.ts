@@ -10,7 +10,6 @@ import { addLights, toNormalMode, toSimulationMode } from '$three/light';
 import { QuakesManager } from '$three/quakes/quakesManager';
 import quakesSample from '$lib/sample.json'
 import { TimeLine } from '$three/timeline';
-import { Quake } from '$three/quakes/quake';
 import type { QuakeData } from '$three/quakes/types';
 
 scene.add(moon);
