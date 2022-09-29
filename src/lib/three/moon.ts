@@ -1,3 +1,4 @@
+import { ChocolateyInstall } from '$env/static/private';
 import * as THREE from 'three'
 import { UNIT_TO_KM } from './constants';
 
@@ -23,19 +24,52 @@ function buildSphereFace(hIndex: number, vIndex: number) {
   );
   const material = new THREE.MeshStandardMaterial({
     // color: `hsl(${(hIndex + 1) * 30 * (vIndex * 2 + 1)}, 100%, 50%)`,
-    map: textureLoader.load(`moon-tiles/tile_16k_${vIndex}_${hIndex}.jpg`)
+    map: textureLoader.load(`moon-tiles/tile_16k_${vIndex}_${hIndex}.jpg`),
   });
 
   return new THREE.Mesh(geometry, material);
 }
 
-const moon = new THREE.Object3D();
+const moon = new THREE.Group();
+
+const moonEdges = new THREE.LineSegments(
+  new THREE.EdgesGeometry(new THREE.SphereGeometry(
+    MOON_UNIT_RADIUS,
+    16,
+    16
+  )),
+  new THREE.LineBasicMaterial({ color: 'hsl(0, 0%, 75%)' })
+)
+moonEdges.visible = false;
 
 for (let i = 0; i < N_FACES; i++) {
-  moon.add(buildSphereFace(i, 0));
+  const face = buildSphereFace(i, 0);
+  moon.add(face);
 }
 for (let i = 0; i < N_FACES; i++) {
-  moon.add(buildSphereFace(i, 1));
+  const face = buildSphereFace(i, 1);
+  moon.add(face);
+
 }
 
-export { moon }
+export { moon, moonEdges }
+
+export function toggleMoonWireframe() {
+  // moon.children.forEach(child => child.material.wireframe = !child.material.wireframe)
+  moon.children.forEach(child => child.visible = !child.visible)
+}
+export function toggleMoonInterior() {
+  moon.children.forEach(child => {
+    const material = child.material as Material;
+    if (material.transparent) {
+      material.transparent = false;
+      material.side = THREE.FrontSide
+      moonEdges.visible = false
+    }
+    else {
+      material.transparent = true;
+      material.side = THREE.BackSide;
+      moonEdges.visible = true
+    }
+  })
+}

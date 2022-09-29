@@ -1,17 +1,34 @@
 <script lang="ts">
+  import { toggleMoonInterior, toggleMoonWireframe } from '$three/moon';
   import { onMount } from 'svelte';
-  import { animate, init, onWindowResize, toggleExternalBodys } from './setup';
+  import {
+    animate,
+    init,
+    onWindowResize,
+    toggleExternalBodys,
+    toggleAllQuakes,
+    quakesManager,
+  } from './setup';
 
   let initilized = false;
   let enableContext = false;
+  let viewQuakes = false;
 
   function toggleContext() {
     enableContext = !enableContext;
     toggleExternalBodys(enableContext);
   }
-
+  function toggleQuakes() {
+    viewQuakes = !viewQuakes;
+    toggleAllQuakes();
+  }
+  let test: string;
   onMount(() => {
     animate();
+    quakesManager.addEventListener(
+      'appear',
+      (quake) => (test = quake.mesh.position.x.toString())
+    );
   });
 </script>
 
@@ -20,7 +37,11 @@
 <main use:init />
 
 <div>
+  <button on:click={toggleMoonWireframe}>Toggle wireframe</button>
+  <button on:click={toggleMoonInterior}>Toggle interior</button>
   <button on:click={toggleContext}>Enable context</button>
+  <button on:click={toggleQuakes}>Show quakes</button>
+  <p style:color="red">{test}</p>
 </div>
 
 <style>
