@@ -1,4 +1,3 @@
-import { ChocolateyInstall } from '$env/static/private';
 import * as THREE from 'three'
 import { UNIT_TO_KM } from './constants';
 
