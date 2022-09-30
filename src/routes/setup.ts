@@ -5,7 +5,7 @@ import { scene } from '$three/scene';
 import { moon, moonEdges } from '$three/moon';
 import { earth } from '$three/celestialbodys/earth';
 import { sun } from '$three/celestialbodys/sun';
-import { cameraControls, initControls } from '$three/controls';
+import { cameraControls, ControlManager, initControls } from '$three/controls';
 import { addLights, toNormalMode, toSimulationMode } from '$three/light';
 import { QuakesManager } from '$three/quakes/quakesManager';
 import quakesSample from '$lib/sample.json'
@@ -17,16 +17,16 @@ scene.add(moonEdges)
 scene.add(earth);
 scene.add(sun);
 
-// const newCube = createPoint(5,new Vector3());
-// scene.add(newCube)
 
 export let quakesManager: QuakesManager;
 export let clock: THREE.Clock;
 export let timeline: TimeLine;
+export let controlManager: ControlManager;
 
 export function animate() {
   requestAnimationFrame(animate);
 
+  controlManager.update();
   const delta = clock.getDelta();
   cameraControls.update(delta);
   timeline.update(delta);
@@ -50,8 +50,8 @@ export function init(container: HTMLElement) {
   clock = new THREE.Clock();
   quakesManager = new QuakesManager(scene, quakesSample as QuakeData[])
   timeline = new TimeLine(2, Infinity)
-  console.log(quakesManager)
   timeline.subscribe(quakesManager.showNextQuake.bind(quakesManager))
+  controlManager = new ControlManager(cameraControls)
 }
 
 export function toggleExternalBodys(enable: boolean) {

@@ -58,9 +58,13 @@ export function toggleMoonWireframe() {
 }
 export function toggleMoonInterior() {
   moon.children.forEach(child => {
-    const material = child.material as Material;
+    // @ts-ignore
+    const material = child.material as THREE.Material;
     material.side = material.side === THREE.FrontSide ?
-      material.side = THREE.BackSide :
-      material.side = THREE.FrontSide;
+      THREE.BackSide :
+      THREE.FrontSide;
   })
 }
+
+// moon.visible = false;
+// toggleMoonWireframe()

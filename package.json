@@ -22,6 +22,7 @@
 	"type": "module",
 	"dependencies": {
 		"@types/three": "^0.144.0",
+		"@vitejs/plugin-basic-ssl": "^0.1.2",
 		"camera-controls": "^1.37.2",
 		"three": "^0.144.0"
 	}
