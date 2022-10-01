@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import { camera } from '$three/camera';
 import { renderer } from '$three/renderer';
 import { scene } from '$three/scene';
-import { moon, moonEdges } from '$three/moon';
 import { earth } from '$three/celestialbodys/earth';
 import { sun } from '$three/celestialbodys/sun';
 import { cameraControls, ControlManager, initControls } from '$three/controls';
@@ -13,8 +12,6 @@ import { TimeLine } from '$three/timeline';
 import type { QuakeData } from '$three/quakes/types';
 import {RaycasterManager} from '$three/labels/raycaster'
 
-scene.add(moon);
-// scene.add(moonEdges)
 scene.add(earth);
 scene.add(sun);
 

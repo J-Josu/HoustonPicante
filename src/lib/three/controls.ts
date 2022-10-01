@@ -48,10 +48,11 @@ class ControlManager {
   control: CameraControls;
   rotation: RotationState;
   rotationDeg: number;
-  rotationState: DeviceOrientation;
+  orientationState: DeviceOrientation;
+  mediaQueryOrientation: MediaQueryList;
   handleKeyDown: (event: KeyboardEvent) => void;
   handleKeyUp: (event: KeyboardEvent) => void;
-  // handleMediaOrientation: (event: MediaQueryListEvent) => void
+  handleMediaOrientation: (event: MediaQueryListEvent) => void;
   handleDeviceOrientation: (event: DeviceOrientationEvent) => void;
   toggleGiroscopic: () => boolean;
 
@@ -66,9 +67,10 @@ class ControlManager {
       left: false
     }
     this.rotationDeg = 0.005;
-    this.rotationState = {
+    this.orientationState = {
       enabled: false,
-      wasDisabled: false,
+      wasDisabled: true,
+      landscape: false,
       base: {
         alpha: 0,
         beta: 0,
@@ -127,59 +129,102 @@ class ControlManager {
       $.rotation.isRotating = $.rotation.up || $.rotation.right || $.rotation.down || $.rotation.left;
     }
 
-    // this.handleMediaOrientation = (event: MediaQueryListEvent) => {
-    //   console.log(event.matches)
-    // }
+    this.handleMediaOrientation = (event: MediaQueryListEvent) => {
+      $.orientationState.landscape = event.matches;
+    }
     this.handleDeviceOrientation = (event) => {
 
       const { alpha, beta, gamma } = event;
+      
+      if (alpha === null || beta === null || gamma === null) return;
+      if (alpha === 0 && beta === 0 && gamma === 0) return;
 
       const crrAlpha = alpha!, crrBeta = beta!, crrGamma = gamma!
 
-      if ($.rotationState.wasDisabled) {
-        $.rotationState.wasDisabled = false;
-        $.rotationState.base = {
-          alpha: alpha || 0,
-          beta: beta || 0,
-          gamma: gamma || 0
-        }
+      $.orientationState.actual.alpha = alpha;
+      $.orientationState.actual.beta = beta;
+      $.orientationState.actual.gamma = gamma;
+
+      if ($.orientationState.wasDisabled) {
+        $.orientationState.wasDisabled = false;
+        $.orientationState.base.alpha = alpha
+        $.orientationState.base.beta = beta
+        $.orientationState.base.gamma = gamma
         $.rotation.isRotating = false;
         $.rotation.up = false;
         $.rotation.right = false;
         $.rotation.down = false;
         $.rotation.left = false;
-        orientation.set($.rotationState)
+        orientation.set($.orientationState)
         return;
       }
 
-      $.rotationState.actual.alpha = alpha || 0;
-      $.rotationState.actual.beta = beta || 0;
-      $.rotationState.actual.gamma = gamma || 0;
-
       let needsUpdate = false;
-      // "landscape-primary" | "landscape-secondary" | "portrait-primary" | "portrait-secondary"
 
-      if (($.rotationState.base.beta - crrBeta) > $.ANGLE_DIFF) {
-        needsUpdate = true;
-        $.rotation.up = true
-        $.rotation.down = false
+      // if (($.orientationState.base.beta - crrBeta) > $.ANGLE_DIFF) {
+      //   needsUpdate = true;
+      //   $.rotation.up = true
+      //   $.rotation.down = false
+      // }
+      // else if (($.orientationState.base.beta - crrBeta) < -$.ANGLE_DIFF) {
+      //   needsUpdate = true;
+      //   $.rotation.up = false
+      //   $.rotation.down = true
+      // }
+      // if (($.orientationState.base.gamma - crrGamma) > $.ANGLE_DIFF) {
+      //   needsUpdate = true;
+      //   $.rotation.right = true
+      //   $.rotation.left = false
+      // }
+      // else if (($.orientationState.base.gamma - crrGamma) < -$.ANGLE_DIFF) {
+      //   needsUpdate = true;
+      //   $.rotation.right = false
+      //   $.rotation.left = true
+      // }
+      const alphaDelta = Math.abs(Math.abs($.orientationState.base.alpha) - Math.abs(crrAlpha))
+      const betaDelta = Math.abs(Math.abs($.orientationState.base.beta) - Math.abs(crrBeta))
+      const gammaDelta = Math.abs(Math.abs($.orientationState.base.gamma) - Math.abs(crrGamma))
+      
+      if (!$.orientationState.landscape) {
+        if (betaDelta > $.ANGLE_DIFF) {
+          needsUpdate = true;
+          const up = crrBeta > $.orientationState.base.beta;
+          $.rotation.up = up
+          $.rotation.down = !up
+        }
+        if (gammaDelta > $.ANGLE_DIFF) {
+          needsUpdate = true;
+          const right = crrGamma < $.orientationState.base.gamma;
+          $.rotation.right = right
+          $.rotation.left = !right
+        }
       }
-      else if (($.rotationState.base.beta - crrBeta) < -$.ANGLE_DIFF) {
-        needsUpdate = true;
-        $.rotation.up = false
-        $.rotation.down = true
-      }
-      if (($.rotationState.base.gamma - crrGamma) > $.ANGLE_DIFF) {
-        needsUpdate = true;
-        $.rotation.right = true
-        $.rotation.left = false
-      }
-      else if (($.rotationState.base.gamma - crrGamma) < -$.ANGLE_DIFF) {
-        needsUpdate = true;
-        $.rotation.right = false
-        $.rotation.left = true
-      }
+      else {
+        if (gammaDelta > $.ANGLE_DIFF) {
+          needsUpdate = true;
+          const up = crrGamma > $.orientationState.base.gamma;
+          $.rotation.up = up
+          $.rotation.down = !up
+        }
+        // if (crrAlpha > $.ANGLE_DIFF) {
+        //   needsUpdate = true;
+        //   // let a = crrAlpha > 180? (crrAlpha-360)*-1: crrAlpha - 180
+        //   // let b = $.orientationState.base.alpha > 180? ($.orientationState.base.alpha-360)*-1:($.orientationState.base.alpha - 180);
+        //   const right = crrAlpha < $.orientationState.base.alpha;
+        //   $.rotation.right = right
+        //   $.rotation.left = !right
+        // }
+        const factor = crrAlpha > 180? 360:0;
+        const a = Math.abs(Math.abs($.orientationState.base.alpha + factor) - Math.abs(crrAlpha))
 
+        if (a > $.ANGLE_DIFF) {
+            needsUpdate = true;
+            const aux = (crrAlpha - $.orientationState.base.alpha)
+            const right = $.orientationState.base.alpha < 180? aux > 0:aux < 0;
+            $.rotation.right = right
+            $.rotation.left = !right
+          }
+      }
 
       if (!needsUpdate) {
         $.rotation.up = false;
@@ -188,16 +233,18 @@ class ControlManager {
         $.rotation.left = false;
       }
       $.rotation.isRotating = needsUpdate;
-      orientation.set($.rotationState);
+      orientation.set($.orientationState);
     }
 
     this.toggleGiroscopic = () => {
-      $.rotationState.enabled = !$.rotationState.enabled;
-      if ($.rotationState.enabled) {
-        $.rotationState.wasDisabled = true;
+      $.orientationState.enabled = !$.orientationState.enabled;
+      if ($.orientationState.enabled) {
+        $.orientationState.wasDisabled = true;
+        $.rotation.isRotating = false;
         window.addEventListener('deviceorientation', $.handleDeviceOrientation)
       }
       else {
+        $.orientationState.wasDisabled = true;
         $.rotation.isRotating = false;
         $.rotation.up = false;
         $.rotation.right = false;
@@ -205,20 +252,15 @@ class ControlManager {
         $.rotation.left = false;
         window.removeEventListener('deviceorientation', $.handleDeviceOrientation)
       }
-      return $.rotationState.enabled;
+      return $.orientationState.enabled;
     }
 
-    window.addEventListener('keydown', this.handleKeyDown)
-    window.addEventListener('keyup', this.handleKeyUp)
+    window.addEventListener('keydown', this.handleKeyDown);
+    window.addEventListener('keyup', this.handleKeyUp);
 
-    // const mql = window.matchMedia("(orientation:landscape)");
-    // mql.addEventListener("change", (event) => {
-    //   if (event.matches) {
-    //     alert("Now in landscape orientation");
-    //   } else {
-    //     alert("Now in portrait orientation");
-    //   }
-    // });
+    this.mediaQueryOrientation = window.matchMedia("(orientation:landscape)");
+    this.mediaQueryOrientation.addEventListener("change", this.handleMediaOrientation);
+    this.orientationState.landscape = this.mediaQueryOrientation.matches
   }
 
   update() {

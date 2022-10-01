@@ -16,24 +16,40 @@ class QuakesManager {
   private listeners: {
     [k in keyof EventsMap]: EventsMap[k][]
   };
+  public labelsContainer: HTMLDivElement;
+  private labels : Quake[];
+  private addLabel : (quake:Quake) => void;
+  private initilizeQuakes : (quakesData: QuakeData[]) => void;
 
   constructor(scene: Scene, quakesData: QuakeData[]) {
     this.scene = scene;
     this.baseQuakes = [];
     this.quakes = [];
-    this.initilizeQuakes(quakesData)
     this.quakesVisibles = false;
     this.currentQuake = 0;
     this.listeners = { 'appear': [], 'hidden': [] }
+    this.labels = []
+    // this.labelsContainer
+
+    const $ = this;
+    
+  this.addLabel = (quake:Quake) => {
+    console.log('hola')
+    this.labels.push(quake)
+    this.labelsContainer.appendChild(quake.label)
+  }
+    this.initilizeQuakes = (quakes: QuakeData[]) =>  {
+      quakes.forEach(quakeData => {
+        const quake = new Quake(quakeData);
+        $.scene.add(quake.mesh);
+        $.baseQuakes.push(quake);
+        quake.onShow = $.addLabel
+      });
+    }
+    this.initilizeQuakes(quakesData)
   }
 
-  initilizeQuakes(quakes: QuakeData[]) {
-    quakes.forEach(quakeData => {
-      const quake = new Quake(quakeData);
-      this.scene.add(quake.mesh);
-      this.baseQuakes.push(quake)
-    });
-  }
+  
 
   toggleQuakesVisualization() {
     this.quakesVisibles = !this.quakesVisibles;
@@ -74,6 +90,10 @@ class QuakesManager {
     else
       this.quakes = this.quakes.sort(short)
     return this
+  }
+
+  update() {
+    // this.labels
   }
 }
 

@@ -14,6 +14,7 @@
   let initilized = false;
   let enableContext = false;
   let viewQuakes = false;
+  let labels : HTMLDivElement;
 
   function toggleContext() {
     enableContext = !enableContext;
@@ -30,12 +31,15 @@
       'appear',
       (quake) => (test = quake.mesh.position.x.toString())
     );
+    quakesManager.labelsContainer = labels
   });
 </script>
 
 <svelte:window on:resize={onWindowResize} />
 
-<main use:init />
+<main use:init>
+</main>
+<div id="labels" bind:this={labels} />
 
 <ul>
   <li>
@@ -50,6 +54,14 @@
 </ul>
 
 <style>
+  #labels {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 0;
+    right: 0;
+    color:hsl(0, 0%, 70%)
+  }
   ul {
     display: flex;
     flex-direction: column;

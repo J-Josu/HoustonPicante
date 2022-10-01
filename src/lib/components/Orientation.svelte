@@ -5,8 +5,11 @@
 <div>
   <button on:click={orientation.toggle}>Toggle Giroscopic</button>
   <p>a:<span>{$orientation.actual.alpha.toPrecision(6)}</span></p>
+  <p>a:<span>{$orientation.base.alpha.toPrecision(6)}</span></p>
   <p>b:<span>{$orientation.actual.beta.toPrecision(6)}</span></p>
+  <p>b:<span>{$orientation.base.beta.toPrecision(6)}</span></p>
   <p>g:<span>{$orientation.actual.gamma.toPrecision(6)}</span></p>
+  <p>g:<span>{$orientation.base.gamma.toPrecision(6)}</span></p>
 </div>
 
 <style>

@@ -10,6 +10,7 @@ interface RotationAnlges {
 export interface DeviceOrientation {
   enabled: boolean,
   wasDisabled: boolean,
+  landscape: boolean,
   base: RotationAnlges,
   actual: RotationAnlges
 }
@@ -18,6 +19,7 @@ const createOrientationStore = () => {
   const { subscribe, set, update } = writable<DeviceOrientation>({
     enabled: false,
     wasDisabled: true,
+    landscape: false,
     base: {
       alpha: 0,
       beta: 0,
