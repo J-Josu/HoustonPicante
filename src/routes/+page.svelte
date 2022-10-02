@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Orientation from '$lib/components/Orientation.svelte';
+  import { orientation } from '$lib/stores/orientationStore';
   import { toggleMoonInterior, toggleMoonWireframe } from '$three/moon';
   import { onMount } from 'svelte';
   import {
@@ -40,45 +40,49 @@
 <main use:initilize />
 <div id="labels" bind:this={labels} />
 
-<ul>
-  <li>
-    <button on:click={toggleMoonWireframe}>Toggle wireframe</button>
-    <button on:click={toggleMoonInterior}>Toggle interior</button>
-    <button on:click={toggleContext}>Enable context</button>
-    <button on:click={toggleQuakes}>Show quakes</button>
-    <button
-      on:mousedown={() => controlManager.setRotation(['down', 'right'])}
-      on:mouseup={() => controlManager.unsetRotation(['down', 'right'])}
-      >right up</button
+<div class="tools" style:top={0}>
+  <button on:click={toggleMoonWireframe}>Toggle wireframe</button>
+  <button on:click={toggleMoonInterior}>Toggle interior</button>
+  <button on:click={toggleContext}>Enable context</button>
+  <button on:click={toggleQuakes}>Show quakes</button>
+</div>
+<div class="tools" style:bottom={0}>
+  <button on:click={orientation.toggle}>Toggle Giroscopic</button>
+  <button on:click={controlManager.resetOrientation}>reset</button>
+  <div class="rotation-container">
+    <button style="top:-4rem"
+      on:mousedown={() => controlManager.setRotation(['down'])}
+      on:mouseup={() => controlManager.unsetRotation(['down'])}>⇧</button
     >
-    <button on:click={controlManager.resetOrientation}>reset</button>
-  </li>
-  <li>
-    <Orientation />
-  </li>
-</ul>
+    <button style="right:-4rem"
+      on:mousedown={() => controlManager.setRotation(['right'])}
+      on:mouseup={() => controlManager.unsetRotation(['right'])}>⇨</button
+    ><button style="bottom:-3rem"
+      on:mousedown={() => controlManager.setRotation(['up'])}
+      on:mouseup={() => controlManager.unsetRotation(['up'])}>⇩</button
+    ><button style="left:-3rem"
+      on:mousedown={() => controlManager.setRotation(['left'])}
+      on:mouseup={() => controlManager.unsetRotation(['left'])}>⇦</button
+    >
+  </div>
+</div>
 
 <style>
   #labels {
-    display: flex;
+    display: hidden;
     flex-direction: column;
     position: absolute;
     top: 0;
     right: 0;
     color: hsl(0, 0%, 70%);
   }
-  ul {
+  .tools {
     display: flex;
-    flex-direction: column;
     gap: 0.25rem;
     position: absolute;
-    top: 0;
     left: 0;
     padding: 0.25rem;
-  }
-  li {
-    display: flex;
-    gap: 0.5rem;
+    width: 100%;
   }
   button {
     padding: 0.5ch;
@@ -88,5 +92,16 @@
     border: 1px solid hsl(0, 0%, 70%);
     border-radius: 2px;
     cursor: pointer;
+  }
+  .rotation-container {
+    margin-left: auto;
+    margin-right: 5rem;
+    margin-bottom: 4rem;
+    position: relative;
+  }
+  .rotation-container button {
+    position: absolute;
+    padding: 0.25rem;
+    font-size: 2rem;
   }
 </style>
