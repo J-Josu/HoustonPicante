@@ -92,6 +92,7 @@
     border: 1px solid hsl(0, 0%, 70%);
     border-radius: 2px;
     cursor: pointer;
+    user-select: none;
   }
   .rotation-container {
     margin-left: auto;
