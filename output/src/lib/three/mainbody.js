@@ -54,7 +54,11 @@ export function createBody(renderer, scene, camera, radius, ySections, xSections
     return bodyGroup;
 }
 export function createBodyEdges(radius, quality, startsVisible) {
-    const edges = new LineSegments(new EdgesGeometry(new SphereGeometry(radius * 0.995, quality * 4, quality * 4)), new LineBasicMaterial({ color: HELPER_LINES_COLOR }));
+    const edges = new LineSegments(new EdgesGeometry(new SphereGeometry(
+    // radius * 1.005,
+    radius * 0.995, 
+    // quality * 4,
+    36, 18)), new LineBasicMaterial({ color: HELPER_LINES_COLOR }));
     edges.visible = startsVisible;
     return edges;
 }

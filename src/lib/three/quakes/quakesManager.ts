@@ -1,6 +1,7 @@
 import type { RaycasterManager } from '$three/labels/raycaster';
+import { MOON_UNIT_RADIUS } from '$three/moon';
 import type { Object3D, Scene } from 'three';
-import { Quake } from './quake';
+import { createMesh, Quake } from './quake';
 import type { QuakeData } from './types';
 
 interface EventsMap {
@@ -37,22 +38,27 @@ class QuakesManager {
     const $ = this;
 
     this.addLabel = (quake: Quake) => {
+      this.labelsContainer.innerHTML = '';
+      console.log(quake.label.textContent);
       quake.showLabel();
       this.labels.push(quake);
       this.labelsContainer.appendChild(quake.label);
     };
     this.initilizeQuakes = (quakes: QuakeData[]) => {
+      // const point = createMesh(MOON_UNIT_RADIUS,20,20,'M');
+      // point.visible = true
+      // scene.add(point)
       quakes.forEach(quakeData => {
         const quake = new Quake(quakeData);
         $.scene.add(quake.mesh);
+        $.scene.add(quake.pulse);
         $.baseQuakes.push(quake);
       });
     };
     this.initilizeQuakes(quakesData);
+
     this.rcManager.addClickListener((element: Object3D) => {
-      console.log(element);
       if (!element.userData.quake) return;
-      console.log(element.userData.quake);
       $.addLabel(element.userData.quake);
     });
   }
@@ -61,7 +67,16 @@ class QuakesManager {
 
   toggleQuakesVisualization() {
     this.quakesVisibles = !this.quakesVisibles;
-    this.baseQuakes.forEach(quake => quake.mesh.visible = this.quakesVisibles);
+    if (this.quakesVisibles) {
+      this.quakes = [];
+      this.baseQuakes.forEach(quake => {
+        quake.setVisibility(true);
+        this.quakes.push(quake);
+      });
+    }
+    else {
+      this.quakes.forEach(quake => quake.setVisibility(false));
+    }
   }
 
   showNextQuake() {
@@ -101,7 +116,7 @@ class QuakesManager {
   }
 
   update() {
-    // this.labels
+    this.quakes.forEach(quake => quake.update());
   }
 }
 

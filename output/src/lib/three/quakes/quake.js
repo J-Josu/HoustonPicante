@@ -1,124 +1,116 @@
 import { RAYCASTER_CHANNEL, UNIT_TO_KM } from '$three/constants';
 import { MOON_UNIT_RADIUS } from '$three/moon';
 import { BoxGeometry, Color, MathUtils, Mesh, MeshBasicMaterial, PlaneGeometry, ShaderMaterial } from 'three';
-const SIZE = 1000 * UNIT_TO_KM;
+import { Pulse } from './wave/Pulse';
+const SIZE = 10 * UNIT_TO_KM;
 const DISTANCE_TO_WORLD_ORIGIN = MOON_UNIT_RADIUS;
-const geometry = new PlaneGeometry(10, 10, 100, 100);
-export const globalUniforms = {
-    time: { value: 0 }
-};
-var vertexShader = `
-    uniform float time;
-    varying vec3 pos;
-    void main()	{
-      pos = position;
-      vec3 p = position;
-      //p.y = sin(p.x * .1 - time) * cos(p.z * .1 - time) * 5.;
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(p,1.0);
-    }
-  `;
-var fragmentShader = `
-    /* based on http://madebyevan.com/shaders/grid/ */
-  
-    varying vec3 pos;
-    uniform float time;
-    
-    float line(float width, vec3 step){
-      vec3 tempCoord = pos / step;
-      
-      vec2 coord = tempCoord.xz;
-
-      vec2 grid = abs(fract(coord - 0.5) - 0.5) / fwidth(coord * width);
-      float line = min(grid.x, grid.y);
-      
-      return 1. - min(line, 1.0);
-    }
-    
-    void main() {
-      float v = line(1., vec3(1.)) + line(1.5, vec3(10.));      
-      vec3 c = v * vec3(0., 1., 1.) * (sin(time * 5. - length(pos.xz) * .5) * .5 + .5);
-      c = mix(vec3(0.5), c, v);
-      
-      gl_FragColor = vec4(c, 1.0);
-    }
-  `;
-export const uniforms = {
-    time: {
-        value: 0
-    }
-};
-const MESH_TABLE_BY_COLOR = {
-    H: new ShaderMaterial({
-        // color: `hsl(${0}, 100%, 50%)`,
-        uniforms: uniforms,
-        vertexShader: vertexShader,
-        fragmentShader: fragmentShader,
-        extensions: { derivatives: true }
+const geometry = new BoxGeometry(SIZE, SIZE, SIZE);
+const MESH_TABLE_BY_TYPE = {
+    M: new MeshBasicMaterial({
+        color: `hsl(${0}, 100%, 50%)`,
+        wireframe: false
     }),
-    M: new ShaderMaterial({
-        // color: `hsl(${64}, 100%, 50%)`,
-        uniforms: uniforms,
-        vertexShader: vertexShader,
-        fragmentShader: fragmentShader,
-        extensions: { derivatives: true }
+    SH: new MeshBasicMaterial({
+        color: `hsl(${64}, 100%, 50%)`,
+        wireframe: false
     }),
-    L: new ShaderMaterial({
-        // color: `hsl(${128}, 100%, 50%)`,
-        uniforms: uniforms,
-        vertexShader: vertexShader,
-        fragmentShader: fragmentShader,
-        extensions: { derivatives: true }
+    A: new MeshBasicMaterial({
+        color: `hsl(${128}, 100%, 50%)`,
+        wireframe: false
     }),
+    _: new MeshBasicMaterial({
+        color: `hsl(${192}, 100%, 50%)`,
+        wireframe: false
+    })
 };
-// const geometry = new BoxGeometry(SIZE, SIZE, SIZE);
-// const MESH_TABLE_BY_COLOR: { [magnitud in MagnitudGrade]: MeshBasicMaterial } = {
-//   H: new MeshBasicMaterial({
-//     color: `hsl(${0}, 100%, 50%)`,
-//     wireframe: false
-//   }),
-//   M: new MeshBasicMaterial({
-//     color: `hsl(${64}, 100%, 50%)`,
-//     wireframe: false
-//   }),
-//   L: new MeshBasicMaterial({
-//     color: `hsl(${128}, 100%, 50%)`,
-//     wireframe: false
-//   })
-// };
-function createLabel(text) {
+function getMesh(type) {
+    if (type === 'M' || type === 'SH')
+        return MESH_TABLE_BY_TYPE[type];
+    if (type.match(/A\d+/))
+        return MESH_TABLE_BY_TYPE.A;
+    return MESH_TABLE_BY_TYPE._;
+}
+function createLabel(data) {
     const elem = document.createElement('div');
-    elem.textContent = text;
+    elem.textContent = data.type;
     elem.style.display = 'none';
     return elem;
 }
-export function createMesh(radiusToOrigin, lat, long, grade) {
-    const newQuake = new Mesh(geometry, MESH_TABLE_BY_COLOR[grade]);
-    newQuake.position.setFromSphericalCoords(radiusToOrigin, MathUtils.degToRad(long), MathUtils.degToRad(lat));
+export function createMesh(radiusToOrigin, lat, lon, depth, type) {
+    const profundity = depth * UNIT_TO_KM;
+    const geo = depth > 0.1 ? new BoxGeometry(SIZE, SIZE, profundity) : geometry;
+    const newQuake = new Mesh(geo, getMesh(type));
+    // newQuake.position.setFromSphericalCoords(
+    //   radiusToOrigin,
+    //   long,
+    //   lat,
+    //   // MathUtils.degToRad(lat - 270),
+    //   // MathUtils.degToRad(long - 270),
+    // );
+    // newQuake.position.setFromSphericalCoords(
+    //   radiusToOrigin,
+    //   (90-lat)*(Math.PI/180),
+    //   (lon+180)*(Math.PI/180),
+    // );
+    const phi = (90 - lon) * (Math.PI / 180), theta = (lat + 180) * (Math.PI / 180);
+    newQuake.position.set(-((radiusToOrigin - profundity / 2) * Math.sin(phi) * Math.cos(theta)), -((radiusToOrigin - profundity / 2) * Math.sin(phi) * Math.sin(theta)), -((radiusToOrigin - profundity / 2) * Math.cos(phi)));
     newQuake.visible = false;
     newQuake.name = 'quake';
     newQuake.layers.enable(RAYCASTER_CHANNEL);
+    newQuake.lookAt(0, 0, 0);
     return newQuake;
 }
 export class Quake {
     mesh;
     label;
     labelContainer;
-    time;
-    grade;
-    alt;
+    date;
+    depth;
+    pulse;
+    isVisible;
     constructor(data) {
-        this.mesh = createMesh(DISTANCE_TO_WORLD_ORIGIN, data.lat, data.long, data.grade);
+        this.mesh = createMesh(DISTANCE_TO_WORLD_ORIGIN, data.latitude, data.longitude, data.depth, data.type);
         this.mesh.userData.quake = this;
-        this.label = createLabel(data.time);
-        this.alt = data.alt;
-        this.time = data.time;
-        this.grade = data.grade;
+        this.pulse = new Pulse(SIZE * 4, this.mesh.material.color.getHex());
+        this.pulse.position.copy(this.mesh.position);
+        this.pulse.lookAt(0, 0, 0);
+        this.label = createLabel(data);
+        this.depth = data.depth;
+        this.date = data.date;
+        this.isVisible = false;
+    }
+    toggleVisivility() {
+        this.isVisible = !this.isVisible;
+        if (this.isVisible) {
+            this.mesh.visible = true;
+            this.pulse.start();
+        }
+        else {
+            this.mesh.visible = false;
+            this.pulse.stop();
+        }
+    }
+    setVisibility(visible) {
+        this.isVisible = visible;
+        if (visible) {
+            this.mesh.visible = true;
+            this.pulse.start();
+        }
+        else {
+            this.mesh.visible = false;
+            this.pulse.stop();
+        }
     }
     showLabel() {
         this.label.style.display = 'block';
     }
     hideLabel() {
         this.label.style.display = 'none';
+    }
+    update() {
+        if (!this.isVisible)
+            return;
+        this.pulse.update();
     }
 }
 //# sourceMappingURL=quake.js.map

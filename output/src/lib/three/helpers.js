@@ -2,7 +2,7 @@ import { AxesHelper, CameraHelper, GridHelper } from 'three';
 import { camera } from './camera';
 import { HELPER_GENERAL_SIZE } from './constants';
 const axisHelper = new AxesHelper(HELPER_GENERAL_SIZE);
-// axisHelper.visible = false;
+axisHelper.visible = false;
 const GRID_SIZE = HELPER_GENERAL_SIZE * 2;
 const GRID_DIVISIONS_FACTOR = 2;
 const gridHelper = new GridHelper(GRID_SIZE, GRID_SIZE * GRID_DIVISIONS_FACTOR, 'hsl(0, 0%, 50%)', 'hsl(0, 0%, 25%)');

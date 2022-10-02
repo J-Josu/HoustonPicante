@@ -1,4 +1,5 @@
-import { Quake } from './quake';
+import { MOON_UNIT_RADIUS } from '$three/moon';
+import { createMesh, Quake } from './quake';
 class QuakesManager {
     scene;
     rcManager;
@@ -23,29 +24,42 @@ class QuakesManager {
         // this.labelsContainer
         const $ = this;
         this.addLabel = (quake) => {
+            this.labelsContainer.innerHTML = '';
+            console.log(quake.label.textContent);
             quake.showLabel();
             this.labels.push(quake);
             this.labelsContainer.appendChild(quake.label);
         };
         this.initilizeQuakes = (quakes) => {
+            // const point = createMesh(MOON_UNIT_RADIUS,20,20,'M');
+            // point.visible = true
+            // scene.add(point)
             quakes.forEach(quakeData => {
                 const quake = new Quake(quakeData);
                 $.scene.add(quake.mesh);
+                $.scene.add(quake.pulse);
                 $.baseQuakes.push(quake);
             });
         };
         this.initilizeQuakes(quakesData);
         this.rcManager.addClickListener((element) => {
-            console.log(element);
             if (!element.userData.quake)
                 return;
-            console.log(element.userData.quake);
             $.addLabel(element.userData.quake);
         });
     }
     toggleQuakesVisualization() {
         this.quakesVisibles = !this.quakesVisibles;
-        this.baseQuakes.forEach(quake => quake.mesh.visible = this.quakesVisibles);
+        if (this.quakesVisibles) {
+            this.quakes = [];
+            this.baseQuakes.forEach(quake => {
+                quake.setVisibility(true);
+                this.quakes.push(quake);
+            });
+        }
+        else {
+            this.quakes.forEach(quake => quake.setVisibility(false));
+        }
     }
     showNextQuake() {
         this.notifyQuakeHidden();
@@ -81,7 +95,7 @@ class QuakesManager {
         return this;
     }
     update() {
-        // this.labels
+        this.quakes.forEach(quake => quake.update());
     }
 }
 export { QuakesManager };

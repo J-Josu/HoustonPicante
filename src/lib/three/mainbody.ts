@@ -88,9 +88,11 @@ export function createBody(
 export function createBodyEdges(radius: number, quality: number, startsVisible: boolean) {
   const edges = new LineSegments(
     new EdgesGeometry(new SphereGeometry(
+      // radius * 1.005,
       radius * 0.995,
-      quality * 4,
-      quality * 4
+      // quality * 4,
+      36,
+      18
     )),
     new LineBasicMaterial({ color: HELPER_LINES_COLOR })
   );

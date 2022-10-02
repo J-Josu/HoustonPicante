@@ -16,7 +16,7 @@ class RaycasterManager {
         this.rc.layers.set(RAYCASTER_CHANNEL);
         this.cachedClick = new Vector2();
         this.actualClick = null;
-        this.lastClick = null;
+        this.lastClick = new Vector2();
         this.onClickSubscribers = [];
         const $ = this;
         this.onClick = (event) => {
@@ -32,8 +32,8 @@ class RaycasterManager {
     update(camera) {
         if (this.actualClick === null)
             return;
-        // TODO: improve this?
-        if (this.actualClick === this.lastClick)
+        // TODO: improve this
+        if (this.actualClick.equals(this.lastClick))
             return;
         this.rc.setFromCamera(this.actualClick, camera);
         const intersections = this.rc.intersectObjects(this.scene.children, true);
@@ -44,7 +44,7 @@ class RaycasterManager {
         intersections.forEach(intersection => {
             this.onClickSubscribers.forEach(callback => callback(intersection.object));
         });
-        this.lastClick = this.actualClick;
+        this.lastClick.copy(this.actualClick);
         this.actualClick = null;
     }
     addClickListener(callback) {
