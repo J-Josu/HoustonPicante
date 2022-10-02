@@ -51,18 +51,18 @@
   <button on:click={controlManager.resetOrientation}>reset</button>
   <div class="rotation-container">
     <button style="top:-4rem"
-      on:mousedown={() => controlManager.setRotation(['down'])}
-      on:mouseup={() => controlManager.unsetRotation(['down'])}>⇧</button
+      on:pointerdown={() => controlManager.setRotation(['down'])}
+      on:pointerup={() => controlManager.unsetRotation(['down'])}>⇧</button
     >
     <button style="right:-4rem"
-      on:mousedown={() => controlManager.setRotation(['right'])}
-      on:mouseup={() => controlManager.unsetRotation(['right'])}>⇨</button
+      on:pointerdown={() => controlManager.setRotation(['right'])}
+      on:pointerup={() => controlManager.unsetRotation(['right'])}>⇨</button
     ><button style="bottom:-3rem"
-      on:mousedown={() => controlManager.setRotation(['up'])}
-      on:mouseup={() => controlManager.unsetRotation(['up'])}>⇩</button
+      on:pointerdown={() => controlManager.setRotation(['up'])}
+      on:pointerup={() => controlManager.unsetRotation(['up'])}>⇩</button
     ><button style="left:-3rem"
-      on:mousedown={() => controlManager.setRotation(['left'])}
-      on:mouseup={() => controlManager.unsetRotation(['left'])}>⇦</button
+      on:pointerdown={() => controlManager.setRotation(['left'])}
+      on:pointerup={() => controlManager.unsetRotation(['left'])}>⇦</button
     >
   </div>
 </div>
