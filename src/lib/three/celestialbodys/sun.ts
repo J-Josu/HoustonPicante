@@ -22,7 +22,7 @@ const textureLoader = new TextureLoader();
 const material = new MeshBasicMaterial({
   // color: `hsl(63, 100%, 50%)`,
   // wireframe: true,
-  map: textureLoader.load(`sun.jpg`)
+  map: textureLoader.load(`sun_low_res.jpg`)
 });
 
 const sun = new Mesh(geometry, material);

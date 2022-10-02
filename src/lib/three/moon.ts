@@ -1,70 +1,51 @@
-import * as THREE from 'three'
+import {
+  BackSide,
+  FrontSide,
+  type Camera,
+  type Group,
+  type LineSegments,
+  type Scene,
+  type WebGLRenderer
+} from 'three';
 import { UNIT_TO_KM } from './constants';
+import { createBody, createBodyEdges } from './mainbody';
 
-const N_FACES = 4;
-const HALF_PI = Math.PI / 2;
+const Y_SECTORS = 2;
+const X_SECTORS = 4;
 
 // from: https://en.wikipedia.org/wiki/List_of_natural_satellites
 const MOON_ARITHMETIC_MEAN_RADIUS = 1_738;
 
 export const MOON_UNIT_RADIUS = MOON_ARITHMETIC_MEAN_RADIUS * UNIT_TO_KM;
 
-const textureLoader = new THREE.TextureLoader();
 
-function buildSphereFace(hIndex: number, vIndex: number) {
-  const geometry = new THREE.SphereGeometry(
-    MOON_UNIT_RADIUS,
-    32,
-    16,
-    hIndex * HALF_PI,
-    HALF_PI,
-    vIndex * HALF_PI,
-    HALF_PI
-  );
-  const material = new THREE.MeshStandardMaterial({
-    // color: `hsl(${(hIndex + 1) * 30 * (vIndex * 2 + 1)}, 100%, 50%)`,
-    map: textureLoader.load(`moon-tiles/tile_16k_${vIndex}_${hIndex}.jpg`),
-  });
+let moon: Group;
 
-  return new THREE.Mesh(geometry, material);
+export function createMoon(renderer: WebGLRenderer, scene: Scene, camera: Camera, onComplete: () => void) {
+  moon = createBody(renderer, scene, camera, MOON_UNIT_RADIUS, Y_SECTORS, X_SECTORS, 'moon-tiles/tile_16k_{y}_{x}.jpg', onComplete);
+  return moon;
 }
 
-const moon = new THREE.Group();
 
-const moonEdges = new THREE.LineSegments(
-  new THREE.EdgesGeometry(new THREE.SphereGeometry(
-    MOON_UNIT_RADIUS * 0.995,
-    16,
-    16
-  )),
-  new THREE.LineBasicMaterial({ color: 'hsl(0, 0%, 75%)' })
-)
-moonEdges.visible = false;
+const EDGES_VISIBLES = false;
 
-for (let i = 0; i < N_FACES; i++) {
-  const face = buildSphereFace(i, 0);
-  moon.add(face);
+let moonEdges: LineSegments;
+
+export function createMoonEdges() {
+  moonEdges = createBodyEdges(MOON_UNIT_RADIUS, 4, EDGES_VISIBLES);
+  return moonEdges;
 }
-for (let i = 0; i < N_FACES; i++) {
-  const face = buildSphereFace(i, 1);
-  moon.add(face);
-
-}
-
-export { moon, moonEdges }
 
 export function toggleMoonWireframe() {
   moonEdges.visible = !moonEdges.visible;
 }
+
 export function toggleMoonInterior() {
   moon.children.forEach(child => {
     // @ts-ignore
     const material = child.material as THREE.Material;
-    material.side = material.side === THREE.FrontSide ?
-      THREE.BackSide :
-      THREE.FrontSide;
-  })
+    material.side = material.side === FrontSide ?
+      BackSide :
+      FrontSide;
+  });
 }
-
-// moon.visible = false;
-// toggleMoonWireframe()

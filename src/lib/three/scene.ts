@@ -1,16 +1,13 @@
 import { Color, Scene } from 'three';
-import { setupHelpers as addHelpers } from './helpers';
+import { addHelpers } from './helpers';
 
-const BACKGROUND_COLOR = 'hsl(255, 25%, 1%)'
+const BACKGROUND_COLOR = 'hsl(255, 25%, 1%)';
 
-function createScene() {
+function setupScene() {
   const scene = new Scene();
-
   scene.background = new Color(BACKGROUND_COLOR);
-  
+  addHelpers(scene);
   return scene;
 }
 
-export const scene = createScene();
-
-addHelpers(scene);
+export const scene = setupScene();

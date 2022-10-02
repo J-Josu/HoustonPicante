@@ -9,12 +9,13 @@
     toggleExternalBodys,
     toggleAllQuakes,
     quakesManager,
+    controlManager,
   } from './setup';
 
   let initilized = false;
   let enableContext = false;
   let viewQuakes = false;
-  let labels : HTMLDivElement;
+  let labels: HTMLDivElement;
 
   function toggleContext() {
     enableContext = !enableContext;
@@ -24,21 +25,19 @@
     viewQuakes = !viewQuakes;
     toggleAllQuakes();
   }
-  let test: string;
+
   onMount(() => {
     animate();
-    quakesManager.addEventListener(
-      'appear',
-      (quake) => (test = quake.mesh.position.x.toString())
-    );
-    quakesManager.labelsContainer = labels
+    quakesManager.labelsContainer = labels;
   });
+  function initilize(node: HTMLElement) {
+    init(node, () => (initilized = true));
+  }
 </script>
 
 <svelte:window on:resize={onWindowResize} />
 
-<main use:init>
-</main>
+<main use:initilize />
 <div id="labels" bind:this={labels} />
 
 <ul>
@@ -47,6 +46,12 @@
     <button on:click={toggleMoonInterior}>Toggle interior</button>
     <button on:click={toggleContext}>Enable context</button>
     <button on:click={toggleQuakes}>Show quakes</button>
+    <button
+      on:mousedown={() => controlManager.setRotation(['down', 'right'])}
+      on:mouseup={() => controlManager.unsetRotation(['down', 'right'])}
+      >right up</button
+    >
+    <button on:click={controlManager.resetOrientation}>reset</button>
   </li>
   <li>
     <Orientation />
@@ -60,7 +65,7 @@
     position: absolute;
     top: 0;
     right: 0;
-    color:hsl(0, 0%, 70%)
+    color: hsl(0, 0%, 70%);
   }
   ul {
     display: flex;

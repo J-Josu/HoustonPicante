@@ -50,11 +50,40 @@ function createFace(texture: Texture, y: number, x: number) {
 }
 
 export async function createMoon(renderer: WebGLRenderer, camera: Camera, scene: Scene, onComplete: () => void) {
-
-
   const moon = new Group();
   scene.add(moon);
-  // (async function myLoop(i: number) {
+  
+
+  let i = 0;
+  function myLoop() {         
+    setTimeout(async function () {
+      const texture = await textureLoader.loadAsync(`moon-tiles/tile_16k_${Math.floor(i / N_FACES)}_${i % N_FACES}.jpg`)
+      renderer.initTexture(texture)
+      moon.add(createFace(texture, Math.floor(i / N_FACES), i % N_FACES));  
+      i++;                    
+      if (i < N_FACES * 2) {      
+        myLoop();           
+      }
+      else {
+        renderer.render(scene,camera)
+        setTimeout(onComplete,0)
+      }
+    }, 0)
+  }
+  setTimeout(myLoop, 0)
+  // myLoop();
+
+  // for (let i = 0; i < N_FACES * 2; i++) {
+  //   const texture = await textureLoader.loadAsync(`moon-tiles/tile_16k_${Math.floor(i / N_FACES)}_${i % N_FACES}.jpg`)
+  //   console.log(i)
+  //   renderer.initTexture(texture)
+  //   moon.add(createFace(texture, Math.floor(i / N_FACES), i%N_FACES));
+  //   // renderer.render(scene,camera)
+  // }
+  // onComplete();
+}
+
+// (async function myLoop(i: number) {
   //   setTimeout(async function () {
   //     const texture = await textureLoader.loadAsync(`moon-tiles/tile_16k_${Math.floor(i / N_FACES)}_${i % N_FACES}.jpg`)
 
@@ -99,37 +128,6 @@ export async function createMoon(renderer: WebGLRenderer, camera: Camera, scene:
   //   }, 50)
   // }
 
-  let i = 0;
-  function myLoop() {         //  create a loop function
-    setTimeout(async function () {   //  call a 3s setTimeout when the loop is called
-      const texture = await textureLoader.loadAsync(`moon-tiles/tile_16k_${Math.floor(i / N_FACES)}_${i % N_FACES}.jpg`)
-      renderer.initTexture(texture)
-      console.log(i)
-      // renderer.render(scene,camera)
-      moon.add(createFace(texture, Math.floor(i / N_FACES), i % N_FACES));  //  your code here
-      i++;                    //  increment the counter
-      if (i < N_FACES * 2) {           //  if the counter < 10, call the loop function
-        myLoop();           //  ..  again which will trigger another 
-      }
-      else {
-        renderer.render(scene,camera)
-        setTimeout(onComplete,0)
-      }
-      //  ..  setTimeout()
-    }, 0)
-  }
-  setTimeout(myLoop, 0)
-  // myLoop();
-
-  // for (let i = 0; i < N_FACES * 2; i++) {
-  //   const texture = await textureLoader.loadAsync(`moon-tiles/tile_16k_${Math.floor(i / N_FACES)}_${i % N_FACES}.jpg`)
-  //   console.log(i)
-  //   renderer.initTexture(texture)
-  //   moon.add(createFace(texture, Math.floor(i / N_FACES), i%N_FACES));
-  //   // renderer.render(scene,camera)
-  // }
-  // onComplete();
-}
 
 // async function buildAsync(iV: number) {
 //   const textures = await Promise.all(

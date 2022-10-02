@@ -1,0 +1,8 @@
+{
+    "rotateSpeed": 1.5,
+    "zoomSpeed": 1,
+    "keys": [],
+    "maxDistance": 50,
+    "minDistance": 5,
+    "enablePan": false
+}

@@ -11,3 +11,7 @@ export const SUN_EARTH_UNITS = SUN_EARTH_DISTANCE * UNIT_TO_KM;
 export const SUN_MOON_UNITS = EARTH_MOON_UNITS + SUN_EARTH_UNITS;
 
 export const RAYCASTER_CHANNEL = 3;
+
+export const HELPER_LINES_COLOR = `hsl(${0}, ${0}%, ${75}%)`;
+
+export const HELPER_GENERAL_SIZE = 10;

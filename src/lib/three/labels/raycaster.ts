@@ -4,12 +4,12 @@ import { RAYCASTER_CHANNEL } from '$three/constants';
 
 class RaycasterManager {
   scene: Scene;
-  canvas: HTMLCanvasElement
+  canvas: HTMLCanvasElement;
   rc: Raycaster;
   cachedClick: Vector2;
   actualClick: Vector2 | null;
   lastClick: Vector2 | null;
-
+  onClickSubscribers: ((element: any) => void)[];
   onClick: (event: MouseEvent) => void;
 
   constructor(scene: Scene, canvas: HTMLCanvasElement) {
@@ -20,30 +20,31 @@ class RaycasterManager {
     this.cachedClick = new Vector2();
     this.actualClick = null;
     this.lastClick = null;
+    this.onClickSubscribers = [];
 
     const $ = this;
 
 
     this.onClick = (event: MouseEvent) => {
       const rect = $.canvas.getBoundingClientRect();
-      const relativeX = event.clientX - rect.left
-      const relativeY = event.clientY - rect.top
+      const relativeX = event.clientX - rect.left;
+      const relativeY = event.clientY - rect.top;
 
       $.cachedClick.x = (relativeX / canvas.clientWidth) * 2 - 1;
       $.cachedClick.y = (relativeY / canvas.clientHeight) * -2 + 1;
       this.actualClick = this.cachedClick;
-    }
+    };
 
     window.addEventListener('pointerdown', this.onClick);
   }
 
   update(camera: Camera) {
     if (this.actualClick === null) return;
-    // TODO
-    if (this.actualClick === this.lastClick) { };
+    // TODO: improve this?
+    if (this.actualClick === this.lastClick) return;
 
-    this.rc.setFromCamera(this.actualClick, camera)
-    const intersections = this.rc.intersectObjects(this.scene.children, true)
+    this.rc.setFromCamera(this.actualClick, camera);
+    const intersections = this.rc.intersectObjects(this.scene.children, true);
 
     if (!intersections.length) {
       this.actualClick = null;
@@ -51,11 +52,16 @@ class RaycasterManager {
     }
 
     intersections.forEach(intersection => {
-      intersection.object.userData.Quake.showLabel()
+      this.onClickSubscribers.forEach(callback => callback(intersection.object));
     });
 
+    this.lastClick = this.actualClick;
     this.actualClick = null;
+  }
+
+  addClickListener<T>(callback: (element: T) => void) {
+    this.onClickSubscribers.push(callback);
   }
 }
 
-export { RaycasterManager }
+export { RaycasterManager };

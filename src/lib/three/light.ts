@@ -10,24 +10,23 @@ directionalLight.lookAt(0, 0, 0);
 directionalLight.castShadow = true;
 directionalLight.visible = false;
 
-
 const directionalLightHelper = new DirectionalLightHelper(directionalLight, 5);
 directionalLightHelper.visible = false;
 
 export function addLights(scene: Scene) {
   scene.add(ambientLight);
   scene.add(directionalLight);
-  scene.add(directionalLightHelper)
+  scene.add(directionalLightHelper);
 }
 
 export function toSimulationMode() {
   ambientLight.intensity = 0.05;
   directionalLight.visible = true;
-  directionalLightHelper.visible = true;
+  // directionalLightHelper.visible = true;
 }
 
 export function toNormalMode() {
   ambientLight.intensity = 0.75;
   directionalLight.visible = false;
-  directionalLightHelper.visible = false;
+  // directionalLightHelper.visible = false;
 }

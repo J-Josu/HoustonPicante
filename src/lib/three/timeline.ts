@@ -8,7 +8,7 @@ class TimeLine {
   constructor(mark_duration: number, marks_quantity: number) {
     this.MARK_DURATION = mark_duration;
     this.length = marks_quantity;
-    this.onChangeSubscribers = []
+    this.onChangeSubscribers = [];
     this.accumulatedTime = 0;
     this.currentMark = 0;
   }
@@ -28,7 +28,7 @@ class TimeLine {
     if (this.accumulatedTime < this.MARK_DURATION) return;
 
     this.accumulatedTime = 0;
-    this.nextMark()
+    this.nextMark();
   }
 
   setMark(index: number) {
@@ -39,12 +39,12 @@ class TimeLine {
     this.currentMark += 1;
     if (this.currentMark > this.length) this.currentMark = 0;
 
-    this.onChangeSubscribers.forEach(callback => callback())
+    this.onChangeSubscribers.forEach(callback => callback());
   }
 
   subscribe(callback: (currentMark?: number) => void) {
-    this.onChangeSubscribers.push(callback)
+    this.onChangeSubscribers.push(callback);
   }
 }
 
-export { TimeLine }
+export { TimeLine };
